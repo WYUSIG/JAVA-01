@@ -8,7 +8,7 @@ public class HelloClassLoader extends ClassLoader {
 
     public static void main(String[] args) {
         try {
-            Class clazz = getHelloClass();
+            Class clazz = Class.forName("Hello", true, new HelloClassLoader());
             Method method = clazz.getMethod("hello");
             method.invoke(clazz.newInstance());
         } catch (Exception e) {
@@ -16,15 +16,10 @@ public class HelloClassLoader extends ClassLoader {
         }
     }
 
-    private static Class getHelloClass(){
-        Class clazz = new HelloClassLoader().findClass("Hello");
-        return clazz;
-    }
-
     @Override
     public Class<?> findClass(String name) {
         try {
-            ClassPathResource resource = new ClassPathResource("/MATA-INF/Hello.xlass");
+            ClassPathResource resource = new ClassPathResource("/META-INF/Hello.xlass");
             int length = (int) resource.contentLength();
             byte[] bytes = new byte[length];
             resource.getInputStream().read(bytes, 0, length);
@@ -38,9 +33,8 @@ public class HelloClassLoader extends ClassLoader {
 
     private byte[] decode(byte[] bytes) {
         byte[] newBytes = new byte[bytes.length];
-        int a = (byte)255;
-        for(int i=0;i<bytes.length;i++){
-            newBytes[i] = (byte) (a-bytes[i]);
+        for (int i = 0; i < bytes.length; i++) {
+            newBytes[i] = (byte) (255 - bytes[i]);
         }
         return newBytes;
     }
