@@ -3,7 +3,7 @@
 
 总结：
 
-#####串行GC：#####
+**串行GC：**
 
 串行GC对新生代使用mark-copy(标记复制)算法，对老年代使用mark-sweep-compact(标记-清除-整理)。由于串行GC是单线程线程收集，从实验数据也可以看出Young GC的min/max time比其他GC要高，堆变大，GC的max time就会上升，所以SerialGC曾经作为javaME的默认垃圾收集器。新生代和老年代收集过程都需要STW
 
@@ -11,7 +11,7 @@
 
 缺点：多核CPU条件下，不能充分利用系统资源，在堆大的情况下会造成长时间STW
 
-#####并行GC#####
+**并行GC**
 
 
 java 5/6/7/8 server模式下的默认垃圾收集器，在新生代使用标记-复制(mark-copy)算法，在老年代使用标记-清除-整理(mark-sweep-compact)算法，-XX:ParallelGCThreads=N来指定GC线程数，默认值为CPU核心数。在多线程收集下收集时间比单线程的SerialGC短，没有进行垃圾回收的时候，不会消耗任何系统资源。但是年轻代和老年代垃圾回收都会触发STW。
@@ -20,7 +20,7 @@ java 5/6/7/8 server模式下的默认垃圾收集器，在新生代使用标记-
 
 缺点：因为垃圾收集全线都需要STW，因此在堆很大的情况下，STW时间会过长，对低延迟敏感的应用将不能忍受
 
-#####CMS GC#####
+**CMS GC**
 
 在年轻使用mark-copy(标记-复制)算法，对老年代使用并发mark-sweep(标记-清除)算法，CMS的设计目的是避免老年代垃圾收集时出现长时间的卡顿，其工作大部分时间可以与业务线程一起并发执行，并且不对老年代进行整理，而是使用空闲列表(free-lists)来管理内存空间的回收。CMS默认使用的并发线程数为CPU核心数的1/4。
 
@@ -29,7 +29,7 @@ java 5/6/7/8 server模式下的默认垃圾收集器，在新生代使用标记-
 缺点：堆太大还是会有长时间的STW，一般4G以下的堆使用。而且相比并行GC，降低了吞吐量。存在失败兜底编程串行GC的风险，导致垃圾收集时间急剧上升。标记-清除算法容易导致内存碎片，碎片过多会导致在老年代还有很多剩余空间时大对象无法分配，不得不提前触发FullGC。
 
 
-#####G1 GC#####
+**G1 GC**
 
 G1的全称是Garbage-First，意为垃圾优先，哪一块的垃圾最多就优先清理它。G1把堆划分为了多个(通常是2048个)可以存放对象的小堆(regions)。这样划分后，使得G1不必每次都去收集整个堆空间，而是以增量的方式进行处理：每次只处理一部分内存块，称为此次GC的回收集(collection set)。每次GC暂停都会收集所有年轻代内存块，但一般只收集部分老年代内存块。
 
@@ -69,9 +69,9 @@ G1的全称是Garbage-First，意为垃圾优先，哪一块的垃圾最多就�
 
 # 实验过程数据 #
 
-###使用 GCLogAnalysis.java 自己演练一遍串行/并行/CMS/G1的案例###
+**使用 GCLogAnalysis.java 自己演练一遍串行/并行/CMS/G1的案例**
 
-####SerialGC####
+**SerialGC**
 
 ---
 
@@ -110,7 +110,7 @@ java -XX:+UseSerialGC -Xms4g -Xmx4g -XX:+PrintGCDetails -XX:+PrintGCDateStamps G
 
 
 
-####ParallelGC####
+**ParallelGC**
 
 ---
 
@@ -146,7 +146,7 @@ java -XX:+UseParallelGC -Xms4g -Xmx4g -XX:+PrintGCDetails -XX:+PrintGCDateStamps
 
 ---
 
-####ConcMarkSweepGC####
+**ConcMarkSweepGC**
 
 ---
 
@@ -182,7 +182,7 @@ java -XX:+UseConcMarkSweepGC -Xms4g -Xmx4g -XX:+PrintGCDetails -XX:+PrintGCDateS
 
 ---
 
-####G1GC####
+**G1GC**
 
 ---
 
@@ -216,11 +216,11 @@ java -XX:+UseG1GC -Xms4g -Xmx4g -XX:+PrintGCDetails -XX:+PrintGCDateStamps GCLog
 
 实验结果：总共发生了12次GC，其中YoungGC 12次，没有发生FullGC。YoungGC的最低和最高耗时分别为10ms和30ms，平均耗时13.3ms。GC造成总STW 160ms。多次运行取中位数：共生成对象次数:16141。
 
-###使用压测工具（wrk 或 sb），演练 gateway-server-0.0.1-SNAPSHOT.jar 示例。###
+**使用压测工具（wrk 或 sb），演练 gateway-server-0.0.1-SNAPSHOT.jar 示例。**
 
 压测命令：sb -u http://localhost:8088/api/hello -c 40 -N 30 -B false
 
-####SerialGC####
+**SerialGC**
 
 ---
 
@@ -256,7 +256,7 @@ java -XX:+UseSerialGC -Xms4g -Xmx4g -jar gateway-server-0.0.1-SNAPSHOT.jar
 
 ---
 
-####ParallelGC####
+**ParallelGC**
 
 ---
 
@@ -292,7 +292,7 @@ java -XX:+UseParallelGC -Xms4g -Xmx4g -jar gateway-server-0.0.1-SNAPSHOT.jar
 
 ---
 
-####ConcMarkSweepGC####
+**ConcMarkSweepGC**
 
 ---
 
@@ -328,7 +328,7 @@ java -XX:+UseConcMarkSweepGC -Xms4g -Xmx4g -jar gateway-server-0.0.1-SNAPSHOT.ja
 
 ---
 
-####G1GC####
+**G1GC**
 
 ---
 
