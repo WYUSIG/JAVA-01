@@ -50,6 +50,23 @@ G1的全称是Garbage-First，意为垃圾优先，哪一块的垃圾最多就�
 |2g|80ms|61.7ms|
 |4g|100ms|86.7ms|
 
+串行->并行->CMS->G1，STW时长变短，以1g堆大小为例：
+
+|垃圾收集器|总STW时长|
+|--|--|
+|SerialGC|460ms|
+|ParallelGC|440ms|
+|ConcMarkSweepGC|370ms|
+|G1GC|200ms|
+
+串行->并行->CMS->G1，整体延迟在降低，以4g堆为例：
+|垃圾收集器|平均响应时长|
+|--|--|
+|SerialGC|1.9ms|
+|ParallelGC|1.6ms|
+|ConcMarkSweepGC|1ms|
+|G1GC|1.2ms|
+
 # 实验过程数据 #
 
 ###使用 GCLogAnalysis.java 自己演练一遍串行/并行/CMS/G1的案例###
