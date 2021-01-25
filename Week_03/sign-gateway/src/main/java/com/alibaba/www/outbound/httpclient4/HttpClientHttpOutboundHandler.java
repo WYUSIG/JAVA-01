@@ -5,6 +5,7 @@ import com.alibaba.www.filter.HttpRequestFilter;
 import com.alibaba.www.filter.HttpResponseFilter;
 import com.alibaba.www.outbound.HttpOutboundHandler;
 import com.alibaba.www.router.HttpEndpointRouter;
+import com.alibaba.www.router.RandomHttpEndpointRouter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpRequest;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
@@ -20,8 +21,26 @@ public class HttpClientHttpOutboundHandler implements HttpOutboundHandler {
     private CloseableHttpAsyncClient httpClient;
     private List<String> backendUrls;
 
-    HttpResponseFilter filter;
-    HttpEndpointRouter router;
+    HttpResponseFilter filter = new HeaderHttpResponseFilter();
+    HttpEndpointRouter router = new RandomHttpEndpointRouter();
+
+    public HttpClientHttpOutboundHandler(List<String> backends){
+        this.backendUrls = backends.stream().map(this::formatUrl).collect(Collectors.toList());
+        int cores = Runtime.getRuntime().availableProcessors();
+        IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
+                .setConnectTimeout(1000)
+                .setSoTimeout(1000)
+                .setIoThreadCount(cores)
+                .setRcvBufSize(32*1024)
+                .build();
+        httpClient = HttpAsyncClients.custom().setMaxConnTotal(40)
+                .setMaxConnPerRoute(8)
+                .setDefaultIOReactorConfig(ioReactorConfig)
+                .setKeepAliveStrategy((response,context)->6000)
+                .build();
+        httpClient.start();
+    }
+
 
     public HttpClientHttpOutboundHandler(HttpResponseFilter filter, HttpEndpointRouter router, List<String> backends) {
         this.filter = filter;

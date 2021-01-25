@@ -21,9 +21,9 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
     private HttpOutboundHandler handler;
     private HttpRequestFilter filter = new HeaderHttpRequestFilter();
 
-    public HttpInboundHandler(List<String> proxyServer,HttpOutboundHandler handler){
+    public HttpInboundHandler(List<String> proxyServer){
         this.proxyServer = proxyServer;
-        this.handler = handler;
+        this.handler = new HttpClientHttpOutboundHandler(this.proxyServer);
     }
 
     @Override

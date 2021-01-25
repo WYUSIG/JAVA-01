@@ -42,7 +42,7 @@ public class HttpInboundServer {
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
             b.group(bossGroup,workerGroup).channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.DEBUG))
-                    .childHandler(new Http);
+                    .childHandler(new HttpInboundInitializer(proxyServers));
             Channel ch = b.bind(port).sync().channel();
             System.out.println("开启netty http服务器，监听地址和端口为http://127.0.0.1:"+port+"/");
             ch.closeFuture().sync();
