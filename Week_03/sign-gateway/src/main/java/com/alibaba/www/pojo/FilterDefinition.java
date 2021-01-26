@@ -1,4 +1,4 @@
-package com.alibaba.www.bean;
+package com.alibaba.www.pojo;
 
 public class FilterDefinition {
 }

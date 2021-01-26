@@ -1,0 +1,7 @@
+sign:
+  gateway:
+    routes:
+      - id: route1
+        uri: https://localhost:8801
+      - id: route2
+        uri: https://localhost:8802
