@@ -1,4 +1,4 @@
-package com.alibaba.www.pojo;
+package com.alibaba.www.bean;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

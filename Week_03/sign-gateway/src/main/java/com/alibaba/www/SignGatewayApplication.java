@@ -1,7 +1,6 @@
 package com.alibaba.www;
 
 import com.alibaba.www.inbound.HttpInboundServer;
-import com.alibaba.www.pojo.GatewayProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -23,7 +22,6 @@ public class SignGatewayApplication {
         HttpInboundServer server = new HttpInboundServer(port, Arrays.asList(proxyServers.split(",")));
         System.out.println(GATEWAY_NAME + " " + GATEWAY_VERSION +" started at http://localhost:" + port + " for server:" + server.toString());
         try {
-//            System.out.println(GatewayProperties.getRoutes());
             server.run();
         }catch (Exception ex){
             ex.printStackTrace();

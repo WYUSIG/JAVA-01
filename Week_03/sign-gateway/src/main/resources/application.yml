@@ -1,7 +1,13 @@
+server:
+  port: 8887
 sign:
   gateway:
     routes:
       - id: route1
         uri: https://localhost:8801
+        serverName: userServer #相同服务名进行负载均衡
+        prefix: /userServer
       - id: route2
         uri: https://localhost:8802
+        serverName: userServer
+        prefix: /userServer
