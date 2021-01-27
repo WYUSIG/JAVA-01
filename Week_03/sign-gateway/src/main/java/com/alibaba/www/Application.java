@@ -1,10 +1,16 @@
 package com.alibaba.www;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.www.exception.NoUniqueFilterDefinitionException;
 import com.alibaba.www.filter.AspectFilter;
+import com.alibaba.www.filter.HttpRequestFilter;
 import com.alibaba.www.inbound.HttpInboundServer;
+import com.alibaba.www.pojo.GatewayProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.FileSystemResourceLoader;
@@ -21,18 +27,22 @@ import java.util.Map;
 public class Application {
 
     public final static String GATEWAY_NAME = "sign-gateway";
-
     public final static String GATEWAY_VERSION = "1.0.0";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoUniqueFilterDefinitionException {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
         applicationContext.register(Application.class,
                 AspectFilter.class);
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(applicationContext);
-        reader.loadBeanDefinitions("classpath:/META-INF/spring-context.xml");
+        int count = reader.loadBeanDefinitions("classpath:/META-INF/spring-context.xml");
+        System.out.println(count);
+//        System.out.println(applicationContext.getBeanFactory().getBean("gatewayMap"));
+        GatewayProperties gatewayProperties = (GatewayProperties)applicationContext.getBeanFactory().getBean("gatewayPropertis");
+        //加载网关配置元信息
+        gatewayProperties.loadProperties(applicationContext);
+        System.out.println(gatewayProperties);
         applicationContext.refresh();
-        Map<String, Object> yamlMap = applicationContext.getBeanFactory().getBean("gatewayMap", Map.class);
-        System.out.println(yamlMap);
+
         String proxyPort = System.getProperty("proxyPort","8888");
         String proxyServers = System.getProperty("proxyServers","http://localhost:8801,http://localhost:8802");
         int port = Integer.parseInt(proxyPort);
@@ -50,7 +60,9 @@ public class Application {
     }
 
 
-    private static void test(){
+    private static void test() throws ClassNotFoundException {
+        Class clazz = Class.forName("com.alibaba.www.filter.HeaderHttpRequestFilter");
+        System.out.println(HttpRequestFilter.class.isAssignableFrom(clazz));
         AntPathMatcher antPathMatcher = new AntPathMatcher();
         boolean match1 = antPathMatcher.match("/freebytes/**", "/freebytes/1getA");
         boolean match2 = antPathMatcher.match("/freebytes/*/get*", "/freebytes/te/getA");

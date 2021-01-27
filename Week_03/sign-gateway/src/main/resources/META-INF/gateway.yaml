@@ -1,7 +1,22 @@
 sign:
   gateway:
+    port: 8888
+    requestFilters:
+      - name: requestFilter1
+        sig: com.alibaba.www.filter.HeaderHttpRequestFilter
     routes:
       - id: route1
         uri: https://localhost:8801
+        requestFilter: requestFilter1
+        responseFilter: responseFilter1
+        predicates:
+          - path: /server1/*
       - id: route2
         uri: https://localhost:8802
+        requestFilter: requestFilter1
+        responseFilter: responseFilter1
+        predicates:
+          - path: /server2/*
+    responseFilters:
+      - name: responseFilter1
+        sig: com.alibaba.www.filter.HeaderHttpResponseFilter

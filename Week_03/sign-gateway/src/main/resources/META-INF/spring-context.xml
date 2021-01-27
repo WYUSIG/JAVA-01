@@ -5,9 +5,10 @@
         xsi:schemaLocation="http://www.springframework.org/schema/beans
         https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-   <bean id="gatewayMap" class="org.springframework.beans.factory.config.YamlMapFactoryBean" >
-       <!-- 关联 yaml 配置 -->
-       <property name="resources" value="classpath:/META-INF/gateway.yaml" />
-   </bean>
+    <bean id="gatewayMap" class="org.springframework.beans.factory.config.YamlMapFactoryBean" >
+        <!-- 关联 yaml 配置 -->
+        <property name="resources" value="classpath:/META-INF/gateway.yaml" />
+    </bean>
+    <bean id="gatewayPropertis" class="com.alibaba.www.pojo.GatewayProperties"/>
 
 </beans>
