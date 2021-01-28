@@ -10,5 +10,7 @@
         <property name="resources" value="classpath:/META-INF/gateway.yaml" />
     </bean>
     <bean id="gatewayPropertis" class="com.alibaba.www.pojo.GatewayProperties"/>
+    <bean id="httpInboundServer" class="com.alibaba.www.inbound.HttpInboundServer"/>
+    <!--<bean id="httpInboundInitializer" class="com.alibaba.www.inbound.HttpInboundInitializer"/>-->
 
 </beans>

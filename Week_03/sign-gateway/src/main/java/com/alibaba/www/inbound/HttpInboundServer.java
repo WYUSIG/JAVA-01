@@ -1,5 +1,6 @@
 package com.alibaba.www.inbound;
 
+import com.alibaba.www.pojo.GatewayProperties;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -11,6 +12,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -19,19 +21,12 @@ public class HttpInboundServer {
 
     private int port;
 
-    private List<String> proxyServers;
-
-    public HttpInboundServer(int port, List<String> proxyServers){
-        this.port = port;
-        this.proxyServers = proxyServers;
-    }
-
     public void run() throws Exception{
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup(16);
         try {
             ServerBootstrap b = new ServerBootstrap();
-            b.option(ChannelOption.SO_BACKLOG,128)
+            b.option(ChannelOption.SO_BACKLOG,256)
                     .option(ChannelOption.TCP_NODELAY,true)
                     .option(ChannelOption.SO_KEEPALIVE,true)
                     .option(ChannelOption.SO_REUSEADDR,true)
@@ -42,8 +37,8 @@ public class HttpInboundServer {
                     .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
             b.group(bossGroup,workerGroup).channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.DEBUG))
-                    .childHandler(new HttpInboundInitializer(proxyServers));
-            Channel ch = b.bind(port).sync().channel();
+                    .childHandler(new HttpInboundInitializer());
+            Channel ch = b.bind().sync().channel();
             System.out.println("开启netty http服务器，监听地址和端口为http://127.0.0.1:"+port+"/");
             ch.closeFuture().sync();
         }finally {

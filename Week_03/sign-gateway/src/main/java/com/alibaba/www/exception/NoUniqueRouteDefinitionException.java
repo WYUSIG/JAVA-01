@@ -7,7 +7,7 @@ package com.alibaba.www.exception;
  * @Date 2021/1/27 0027
  * @Version V1.0
  **/
-public class NoUniqueRouteDefinitionException {
+public class NoUniqueRouteDefinitionException extends Exception {
 
     public NoUniqueRouteDefinitionException(String message) {
         super();

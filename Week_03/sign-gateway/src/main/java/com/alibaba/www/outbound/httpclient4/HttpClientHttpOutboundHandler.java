@@ -4,6 +4,7 @@ import com.alibaba.www.filter.HeaderHttpResponseFilter;
 import com.alibaba.www.filter.HttpRequestFilter;
 import com.alibaba.www.filter.HttpResponseFilter;
 import com.alibaba.www.outbound.HttpOutboundHandler;
+import com.alibaba.www.pojo.RouteDefinition;
 import com.alibaba.www.router.HttpEndpointRouter;
 import com.alibaba.www.router.RandomHttpEndpointRouter;
 import io.netty.buffer.Unpooled;
@@ -32,10 +33,14 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class HttpClientHttpOutboundHandler implements HttpOutboundHandler {
 
     private CloseableHttpAsyncClient httpClient;
-    private List<String> backendUrls;
 
     HttpResponseFilter filter = new HeaderHttpResponseFilter();
-    HttpEndpointRouter router = new RandomHttpEndpointRouter();
+
+    private RouteDefinition routeDefinition;
+
+    public HttpClientHttpOutboundHandler(RouteDefinition routeDefinition){
+        this.routeDefinition = routeDefinition;
+    }
 
     public HttpClientHttpOutboundHandler(List<String> backends){
         this.backendUrls = backends.stream().map(this::formatUrl).collect(Collectors.toList());
@@ -79,10 +84,9 @@ public class HttpClientHttpOutboundHandler implements HttpOutboundHandler {
     }
 
     @Override
-    public void handle(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx, HttpRequestFilter filter) {
+    public void handle(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx) {
         String backendUrl = router.route(this.backendUrls);
         final String url = backendUrl + fullRequest.uri();
-        filter.filter(fullRequest, ctx);
         fetchGet(fullRequest, ctx, url);
     }
 

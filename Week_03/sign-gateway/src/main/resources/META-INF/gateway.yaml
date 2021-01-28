@@ -1,6 +1,8 @@
 sign:
   gateway:
     port: 8888
+    handler: httpclient4
+    strategy: random
     requestFilters:
       - name: requestFilter1
         sig: com.alibaba.www.filter.HeaderHttpRequestFilter
@@ -16,7 +18,7 @@ sign:
         requestFilter: requestFilter1
         responseFilter: responseFilter1
         predicates:
-          - path: /server2/*
+          - path: /server1/*
     responseFilters:
       - name: responseFilter1
         sig: com.alibaba.www.filter.HeaderHttpResponseFilter

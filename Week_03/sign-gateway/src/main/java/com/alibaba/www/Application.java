@@ -29,31 +29,30 @@ public class Application {
     public final static String GATEWAY_NAME = "sign-gateway";
     public final static String GATEWAY_VERSION = "1.0.0";
 
-    public static void main(String[] args) throws NoUniqueFilterDefinitionException {
+    public static void main(String[] args) throws Exception {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
         applicationContext.register(Application.class,
                 AspectFilter.class);
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(applicationContext);
         int count = reader.loadBeanDefinitions("classpath:/META-INF/spring-context.xml");
-        System.out.println(count);
+//        System.out.println(count);
 //        System.out.println(applicationContext.getBeanFactory().getBean("gatewayMap"));
         GatewayProperties gatewayProperties = (GatewayProperties)applicationContext.getBeanFactory().getBean("gatewayPropertis");
         //加载网关配置元信息
         gatewayProperties.loadProperties(applicationContext);
-        System.out.println(gatewayProperties);
+//        System.out.println(gatewayProperties);
         applicationContext.refresh();
 
-        String proxyPort = System.getProperty("proxyPort","8888");
-        String proxyServers = System.getProperty("proxyServers","http://localhost:8801,http://localhost:8802");
-        int port = Integer.parseInt(proxyPort);
+//        String proxyPort = System.getProperty("proxyPort","8888");
+//        String proxyServers = System.getProperty("proxyServers","http://localhost:8801,http://localhost:8802");
+//        int port = Integer.parseInt(proxyPort);
         System.out.println(GATEWAY_NAME + " " + GATEWAY_VERSION +" starting...");
-        HttpInboundServer server = new HttpInboundServer(port, Arrays.asList(proxyServers.split(",")));
-        System.out.println(GATEWAY_NAME + " " + GATEWAY_VERSION +" started at http://localhost:" + port + " for server:" + server.toString());
+//        HttpInboundServer server = new HttpInboundServer(port, Arrays.asList(proxyServers.split(",")));
+        HttpInboundServer server = applicationContext.getBeanFactory().getBean("httpInboundServer",HttpInboundServer.class);
+        server.setPort(gatewayProperties.getPort());
+        System.out.println(GATEWAY_NAME + " " + GATEWAY_VERSION +" started at http://localhost:" + gatewayProperties.getPort() + " for server:" + server.toString());
         try {
-            test();
             server.run();
-        }catch (Exception ex){
-            ex.printStackTrace();
         }finally {
             applicationContext.close();
         }
