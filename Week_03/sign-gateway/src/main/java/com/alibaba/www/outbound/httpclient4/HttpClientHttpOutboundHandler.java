@@ -40,10 +40,6 @@ public class HttpClientHttpOutboundHandler implements HttpOutboundHandler {
 
     public HttpClientHttpOutboundHandler(RouteDefinition routeDefinition){
         this.routeDefinition = routeDefinition;
-    }
-
-    public HttpClientHttpOutboundHandler(List<String> backends){
-        this.backendUrls = backends.stream().map(this::formatUrl).collect(Collectors.toList());
         int cores = Runtime.getRuntime().availableProcessors();
         IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
                 .setConnectTimeout(1000)
@@ -59,35 +55,10 @@ public class HttpClientHttpOutboundHandler implements HttpOutboundHandler {
         httpClient.start();
     }
 
-
-    public HttpClientHttpOutboundHandler(HttpResponseFilter filter, HttpEndpointRouter router, List<String> backends) {
-        this.filter = filter;
-        this.router = router;
-        this.backendUrls = backends.stream().map(this::formatUrl).collect(Collectors.toList());
-        int cores = Runtime.getRuntime().availableProcessors();
-        IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
-                .setConnectTimeout(1000)
-                .setSoTimeout(1000)
-                .setIoThreadCount(cores)
-                .setRcvBufSize(32*1024)
-                .build();
-        httpClient = HttpAsyncClients.custom().setMaxConnTotal(40)
-                .setMaxConnPerRoute(8)
-                .setDefaultIOReactorConfig(ioReactorConfig)
-                .setKeepAliveStrategy((response,context)->6000)
-                .build();
-        httpClient.start();
-    }
-
-    private String formatUrl(String backend) {
-        return backend.endsWith("/")?backend.substring(0,backend.length()-1):backend;
-    }
 
     @Override
     public void handle(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx) {
-        String backendUrl = router.route(this.backendUrls);
-        final String url = backendUrl + fullRequest.uri();
-        fetchGet(fullRequest, ctx, url);
+        fetchGet(fullRequest, ctx);
     }
 
     private void fetchGet(final FullHttpRequest inbound, final ChannelHandlerContext ctx, final String url) {

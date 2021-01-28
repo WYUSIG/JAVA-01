@@ -93,6 +93,9 @@ public class GatewayProperties {
         RouteDefinition routeDefinition = new RouteDefinition();
         routeDefinition.setId(String.valueOf(map.get("id")));
         routeDefinition.setUri(String.valueOf(map.get("uri")));
+        String uri = String.valueOf(map.get("uri"));
+        uri = uri.endsWith("/")?uri.substring(0,uri.length()-1):uri;
+        routeDefinition.setUri(uri);
         routeDefinition.setServerName(String.valueOf(map.get("serverName")));
         routeDefinition.setRequestFilter(this.requestFilters.get(String.valueOf(map.get("requestFilter"))));
         routeDefinition.setResponseFilter(this.responseFilters.get(String.valueOf(map.get("responseFilter"))));
