@@ -23,7 +23,7 @@ public interface HttpEndpointRouter {
                 boolean march = antPathMatcher.match(pattern,uri);
                 if(march == true){
                     res.add(routeDefinition);
-                    break;
+//                    break;
                 }
             }
         }

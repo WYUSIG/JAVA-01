@@ -9,8 +9,9 @@
         <!-- 关联 yaml 配置 -->
         <property name="resources" value="classpath:/META-INF/gateway.yaml" />
     </bean>
-    <bean id="gatewayPropertis" class="com.alibaba.www.pojo.GatewayProperties"/>
-    <bean id="httpInboundServer" class="com.alibaba.www.inbound.HttpInboundServer"/>
+    <!--<bean id="gatewayPropertis" class="com.alibaba.www.pojo.GatewayProperties"/>-->
+    <!--<bean id="httpInboundServer" class="com.alibaba.www.inbound.HttpInboundServer"/>-->
+    <!--<bean id="httpInboundHandler" class="com.alibaba.www.inbound.HttpInboundHandler"/>-->
     <!--<bean id="httpInboundInitializer" class="com.alibaba.www.inbound.HttpInboundInitializer"/>-->
 
 </beans>

@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.www.exception.NoUniqueFilterDefinitionException;
 import com.alibaba.www.filter.AspectFilter;
 import com.alibaba.www.filter.HttpRequestFilter;
+import com.alibaba.www.inbound.HttpInboundHandler;
 import com.alibaba.www.inbound.HttpInboundServer;
 import com.alibaba.www.pojo.GatewayProperties;
+import com.alibaba.www.util.SpringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -29,6 +31,20 @@ public class Application {
     public final static String GATEWAY_NAME = "sign-gateway";
     public final static String GATEWAY_VERSION = "1.0.0";
 
+    @Bean
+    public GatewayProperties gatewayProperties(){
+        return new GatewayProperties();
+    }
+
+    @Bean HttpInboundServer httpInboundServer(){
+        return new HttpInboundServer();
+    }
+
+    @Bean
+    public SpringUtil springUtil(){
+        return new SpringUtil();
+    }
+
     public static void main(String[] args) throws Exception {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
         applicationContext.register(Application.class,
@@ -37,18 +53,20 @@ public class Application {
         int count = reader.loadBeanDefinitions("classpath:/META-INF/spring-context.xml");
 //        System.out.println(count);
 //        System.out.println(applicationContext.getBeanFactory().getBean("gatewayMap"));
-        GatewayProperties gatewayProperties = (GatewayProperties)applicationContext.getBeanFactory().getBean("gatewayPropertis");
+//        GatewayProperties gatewayProperties = applicationContext.getBean(GatewayProperties.class);
         //加载网关配置元信息
-        gatewayProperties.loadProperties(applicationContext);
+//        gatewayProperties.loadProperties(applicationContext);
 //        System.out.println(gatewayProperties);
         applicationContext.refresh();
+        GatewayProperties gatewayProperties = applicationContext.getBean(GatewayProperties.class);
+        gatewayProperties.loadProperties(applicationContext);
 
 //        String proxyPort = System.getProperty("proxyPort","8888");
 //        String proxyServers = System.getProperty("proxyServers","http://localhost:8801,http://localhost:8802");
 //        int port = Integer.parseInt(proxyPort);
         System.out.println(GATEWAY_NAME + " " + GATEWAY_VERSION +" starting...");
 //        HttpInboundServer server = new HttpInboundServer(port, Arrays.asList(proxyServers.split(",")));
-        HttpInboundServer server = applicationContext.getBeanFactory().getBean("httpInboundServer",HttpInboundServer.class);
+        HttpInboundServer server = applicationContext.getBean(HttpInboundServer.class);
         server.setPort(gatewayProperties.getPort());
         System.out.println(GATEWAY_NAME + " " + GATEWAY_VERSION +" started at http://localhost:" + gatewayProperties.getPort() + " for server:" + server.toString());
         try {

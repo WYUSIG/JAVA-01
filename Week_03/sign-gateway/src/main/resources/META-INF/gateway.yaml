@@ -8,13 +8,13 @@ sign:
         sig: com.alibaba.www.filter.HeaderHttpRequestFilter
     routes:
       - id: route1
-        uri: https://localhost:8801
+        uri: http://localhost:8804/test
         requestFilter: requestFilter1
         responseFilter: responseFilter1
         predicates:
-          - path: /server1/*
+          - path: /test/*
       - id: route2
-        uri: https://localhost:8802
+        uri: http://localhost:8801
         requestFilter: requestFilter1
         responseFilter: responseFilter1
         predicates:

@@ -46,8 +46,8 @@ public class GatewayProperties {
         Map<String, Object> sign = (Map<String, Object>) yamlMap.get("sign");
         Map<String, Object> gateway = (Map<String, Object>) sign.get("gateway");
         this.port = (int) gateway.get("port");
-        this.handler = (String) gateway.get("handler");
-        this.strategy = (String) gateway.get("strategy");
+        this.handler = String.valueOf(gateway.get("handler"));
+        this.strategy = String.valueOf(gateway.get("strategy"));
         List<Map<String, String>> requestSourceFilters = (ArrayList<Map<String, String>>) gateway.get("requestFilters");
         List<FilterDefinition> requestFilterDefinitionList = requestSourceFilters.stream().map(this::parseFilter).collect(Collectors.toList());
         for (FilterDefinition filterDefinition : requestFilterDefinitionList) {
@@ -79,7 +79,7 @@ public class GatewayProperties {
             }
             this.routes.put(routeDefinition.getId(), routeDefinition);
         }
-//        System.out.println(routeList);
+//        System.out.println(this);
     }
 
     private FilterDefinition parseFilter(Map<String, String> map) {
@@ -107,7 +107,9 @@ public class GatewayProperties {
 
 
     private String parsePredicates(Map<String, String> map) {
-        return map.get("path");
+        String path =  map.get("path");
+        path = path.endsWith("/")?path.substring(0,path.length()-1):path;
+        return path;
     }
 
 

@@ -1,17 +1,10 @@
-package com.alibaba.www.proxy;
+package com.alibaba.www.util;
 
-import com.alibaba.www.filter.HttpRequestFilter;
 import com.alibaba.www.pojo.GatewayProperties;
 import com.alibaba.www.pojo.RouteDefinition;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.util.AntPathMatcher;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static com.alibaba.www.pojo.GatewayProperties.POLLING_STRATEGY;
 
 /**
  * @ClassName FilterProxyFactory
@@ -34,7 +27,7 @@ public class ProxyFactoryUtil {
             targetObject = clazz.getDeclaredConstructor(GatewayProperties.class,String.class).newInstance(gatewayProperties,uri);
         }
         ProxyFactory proxyFactory = new ProxyFactory(targetObject);
-        proxyFactory.setTargetClass(clazz);
+//        proxyFactory.setTargetClass(clazz);
         return proxyFactory;
     }
 
@@ -44,7 +37,7 @@ public class ProxyFactoryUtil {
         Object targetObject = clazz.newInstance();
         // 注入目标对象（被代理）
         ProxyFactory proxyFactory = new ProxyFactory(targetObject);
-        proxyFactory.setTargetClass(clazz);
+//        proxyFactory.setTargetClass(clazz);
         return proxyFactory;
     }
 
@@ -55,7 +48,7 @@ public class ProxyFactoryUtil {
             Object targetObject = constructor.newInstance(routeDefinition);
             ProxyFactory proxyFactory = new ProxyFactory(targetObject);
             proxyFactory.setTarget(targetObject);
-            proxyFactory.setTargetClass(clazz);
+//            proxyFactory.setTargetClass(clazz);
             return proxyFactory;
         }else {
             return null;

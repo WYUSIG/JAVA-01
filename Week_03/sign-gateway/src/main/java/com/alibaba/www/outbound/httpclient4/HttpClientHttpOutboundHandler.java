@@ -10,10 +10,7 @@ import com.alibaba.www.router.RandomHttpEndpointRouter;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.concurrent.FutureCallback;
@@ -61,12 +58,11 @@ public class HttpClientHttpOutboundHandler implements HttpOutboundHandler {
         fetchGet(fullRequest, ctx);
     }
 
-    private void fetchGet(final FullHttpRequest inbound, final ChannelHandlerContext ctx, final String url) {
-        final HttpGet httpGet = new HttpGet(url);
+    private void fetchGet(final FullHttpRequest inbound, final ChannelHandlerContext ctx) {
+        final HttpGet httpGet = new HttpGet(routeDefinition.getUri());
         //httpGet.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
         httpGet.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_KEEP_ALIVE);
         httpGet.setHeader("mao", inbound.headers().get("mao"));
-
         httpClient.execute(httpGet, new FutureCallback<HttpResponse>() {
             @Override
             public void completed(final HttpResponse endpointResponse) {
@@ -95,28 +91,16 @@ public class HttpClientHttpOutboundHandler implements HttpOutboundHandler {
     private void handleResponse(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx, final HttpResponse endpointResponse) throws Exception {
         FullHttpResponse response = null;
         try {
-//            String value = "hello,kimmking";
-//            response = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer(value.getBytes("UTF-8")));
-//            response.headers().set("Content-Type", "application/json");
-//            response.headers().setInt("Content-Length", response.content().readableBytes());
-
-
             byte[] body = EntityUtils.toByteArray(endpointResponse.getEntity());
-//            System.out.println(new String(body));
-//            System.out.println(body.length);
-
             response = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer(body));
-
             response.headers().set("Content-Type", "application/json");
-            response.headers().setInt("Content-Length", Integer.parseInt(endpointResponse.getFirstHeader("Content-Length").getValue()));
-
-            filter.filter(response);
-
-//            for (Header e : endpointResponse.getAllHeaders()) {
-//                //response.headers().set(e.getName(),e.getValue());
-//                System.out.println(e.getName() + " => " + e.getValue());
-//            }
-
+            if(endpointResponse.getFirstHeader("Content-Length") == null){
+                handlerNoContentLength(ctx);
+            }else {
+                String length = endpointResponse.getFirstHeader("Content-Length").getValue();
+                response.headers().setInt("Content-Length", Integer.parseInt(length));
+                filter.filter(response);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             response = new DefaultFullHttpResponse(HTTP_1_1, NO_CONTENT);
@@ -131,7 +115,7 @@ public class HttpClientHttpOutboundHandler implements HttpOutboundHandler {
                 }
             }
             ctx.flush();
-            //ctx.close();
+            ctx.close();
         }
 
     }
@@ -142,4 +126,11 @@ public class HttpClientHttpOutboundHandler implements HttpOutboundHandler {
     }
 
 
+    private void handlerNoContentLength(ChannelHandlerContext ctx) throws Exception{
+        String msg = "目标路由网址报文未携带Content-Length";
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(msg.getBytes("UTF-8")));
+        response.headers().set("Content-Type","application/json");
+        response.headers().setInt("Content-Length",response.content().readableBytes());
+        ctx.writeAndFlush(response);
+    }
 }
