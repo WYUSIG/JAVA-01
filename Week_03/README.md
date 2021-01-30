@@ -6,7 +6,7 @@
 - 使用了Spring的ProxyFactory进行动态代理
 - 实现了路由及简单的负载均衡
 
-...
+···
 sign:
 	  gateway:
 	    port: 8888  #netty监听端口
@@ -31,4 +31,4 @@ sign:
 	    responseFilters:
 	      - name: responseFilter1
 	        sig: com.alibaba.www.filter.HeaderHttpResponseFilter
-...
+···
