@@ -54,26 +54,18 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
             //根据正则匹配及负载均衡策略命中一个路由
             RouteDefinition routeDefinition = ((HttpEndpointRouter) routeProxyFactory.getProxy()).route();
             if (routeDefinition != null) {
-                System.out.println();
-                System.out.println("匹配成功，" + uri + "命中路由为：");
-                System.out.println("路由id\t\t链接\t\t匹配规则\t\trequest拦截器\t\tresponse拦截器");
-                System.out.println(routeDefinition.getId() + "\t\t" + routeDefinition.getUri() + "\t\t" + routeDefinition.getPredicates() + "\t\t" + routeDefinition.getRequestFilter().getSig() + "\t\t" + routeDefinition.getResponseFilter().getSig());
-                ProxyFactory requestProxyFactory = ProxyFactoryUtil.getRequestFilterProxyFactory(routeDefinition);
-                //aop动态代理requestFilter
-                HttpRequestFilter requestFilter = (HttpRequestFilter) requestProxyFactory.getProxy();
-                requestFilter.filter(fullHttpRequest, ctx);
-                //根据配置元信息handler动态代理httpclient等handler
-                String handler = gatewayProperties.getHandler();
-                if (GatewayProperties.HTTP_CLIENT_HANDLER.equals(handler)) {
-                    httpClientHttpOutboundHandler.handle(routeDefinition, fullHttpRequest, ctx);
-                } else if (GatewayProperties.NETTY_HANDLER.equals(handler)) {
-                    netty4HttpClient.handle(routeDefinition, fullHttpRequest, ctx);
-                } else {
-                    handlerNoOutbound(ctx);
-                }
+                handleWithRoute(ctx,fullHttpRequest,routeDefinition,uri);
             } else {
-                System.out.println("匹配失败，没有命中路由为，uri:" + uri);
-                handlerNoPathMatcherRoute(ctx);
+                //匹配不上，加上/再次尝试
+                uri = formatUriForNoMatcher(uri);
+                ProxyFactory noMatchaerRouteProxyFactory = ProxyFactoryUtil.getEndpointRouterProxyFactory(gatewayProperties, uri);
+                routeDefinition = ((HttpEndpointRouter) noMatchaerRouteProxyFactory.getProxy()).route();
+                if(routeDefinition != null){
+                    handleWithRoute(ctx,fullHttpRequest,routeDefinition,uri);
+                }else {
+                    System.out.println("匹配失败，没有命中路由为，uri:" + uri);
+                    handlerNoPathMatcherRoute(ctx);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,12 +74,44 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    private void handleWithRoute(ChannelHandlerContext ctx,FullHttpRequest fullHttpRequest,RouteDefinition routeDefinition,String uri) throws Exception{
+        System.out.println();
+        System.out.println("匹配成功，" + uri + "命中路由为：");
+        System.out.println("路由id\t\t链接\t\t匹配规则\t\trequest拦截器\t\tresponse拦截器");
+        System.out.println(routeDefinition.getId() + "\t\t" + routeDefinition.getUri() + "\t\t" + routeDefinition.getPredicates() + "\t\t" + routeDefinition.getRequestFilter().getSig() + "\t\t" + routeDefinition.getResponseFilter().getSig());
+        ProxyFactory requestProxyFactory = ProxyFactoryUtil.getRequestFilterProxyFactory(routeDefinition);
+        //aop动态代理requestFilter
+        HttpRequestFilter requestFilter = (HttpRequestFilter) requestProxyFactory.getProxy();
+        requestFilter.filter(fullHttpRequest, ctx);
+        //根据配置元信息handler动态代理httpclient等handler
+        String handler = gatewayProperties.getHandler();
+        if (GatewayProperties.HTTP_CLIENT_HANDLER.equals(handler)) {
+            httpClientHttpOutboundHandler.handle(routeDefinition, fullHttpRequest, ctx);
+        } else if (GatewayProperties.NETTY_HANDLER.equals(handler)) {
+            netty4HttpClient.handle(routeDefinition, fullHttpRequest, ctx);
+        } else {
+            handlerNoOutbound(ctx);
+        }
+    }
+
     private String formatUri(String uri) {
         String[] s = uri.split("\\?");
         String parameters = "";
         if (s.length > 0) {
-//            uri = s[0].endsWith("/") ? s[0] : s[0] + "/";
             uri = s[0].endsWith("/") ? s[0].substring(0, s[0].length() - 1) : s[0];
+        }
+        if (s.length > 1) {
+            parameters = "?" + s[1];
+            uri += parameters;
+        }
+        return uri;
+    }
+
+    private String formatUriForNoMatcher(String uri){
+        String[] s = uri.split("\\?");
+        String parameters = "";
+        if (s.length > 0) {
+            uri = s[0].endsWith("/") ? s[0] : s[0] + "/";
         }
         if (s.length > 1) {
             parameters = "?" + s[1];

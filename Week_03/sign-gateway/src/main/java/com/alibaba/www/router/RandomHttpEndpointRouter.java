@@ -19,6 +19,9 @@ public class RandomHttpEndpointRouter implements HttpEndpointRouter {
         if(routeDefinitionList.size() == 0){
             return null;
         }
+        if(routeDefinitionList.size() == 1){
+            return routeDefinitionList.get(0);
+        }
         Random r = new Random(System.currentTimeMillis());
         int ran = r.nextInt(routeDefinitionList.size());
         return routeDefinitionList.get(ran);

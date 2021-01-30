@@ -26,6 +26,9 @@ public class PollingHttpEndpointRouter implements HttpEndpointRouter{
         if(routeDefinitionList.size() == 0){
             return null;
         }
+        if(routeDefinitionList.size() == 1){
+            return routeDefinitionList.get(0);
+        }
         routeDefinitionList.sort(Comparator.comparingInt(RouteDefinition::getCount));
         routeDefinitionList.get(0).setCount(routeDefinitionList.get(0).getCount()+1);
         return routeDefinitionList.get(0);
