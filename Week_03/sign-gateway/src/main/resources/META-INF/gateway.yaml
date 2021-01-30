@@ -1,8 +1,8 @@
 sign:
   gateway:
     port: 8888
-    handler: httpclient4
-    strategy: random
+    handler: httpclient
+    strategy: polling
     requestFilters:
       - name: requestFilter1
         sig: com.alibaba.www.filter.HeaderHttpRequestFilter

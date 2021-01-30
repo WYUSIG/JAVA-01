@@ -1,26 +1,23 @@
 package com.alibaba.www.pojo;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.www.exception.NoSuchFilterDefinitionException;
-import com.alibaba.www.exception.NoSuchRouteDefinitionException;
 import com.alibaba.www.exception.NoUniqueFilterDefinitionException;
 import com.alibaba.www.exception.NoUniqueRouteDefinitionException;
-import com.alibaba.www.filter.HttpRequestFilter;
-import com.sun.org.apache.xerces.internal.xs.datatypes.ObjectList;
 import lombok.Data;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.util.AntPathMatcher;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Data
 public class GatewayProperties {
 
-    public static final String HTTP_CLIENT_HANDLER = "httpclient4";
-    public static final String OK_HTTP_HANDLER = "okhttp";
-    public static final String NETTY = "netty";
+    public static final String HTTP_CLIENT_HANDLER = "httpclient";
+//    public static final String OK_HTTP_HANDLER = "okhttp";   //未实现
+    public static final String NETTY_HANDLER = "netty";    //已实现，但是压测rps只有65左右,hahaha
 
     public static final String RANDOM_STRATEGY = "random";
     public static final String POLLING_STRATEGY = "polling";
@@ -38,16 +35,16 @@ public class GatewayProperties {
 
     private Map<String, RouteDefinition> routes = new HashMap<>();
 
-//    private Map<String,String> routePathMatcherCache = new ConcurrentHashMap<>();
 
-    //NoUniqueFilterDefinitionException,NoUniqueRouteDefinitionException
     public void loadProperties(AnnotationConfigApplicationContext applicationContext) throws Exception {
         Map<String, Object> yamlMap = applicationContext.getBeanFactory().getBean("gatewayMap", Map.class);
         Map<String, Object> sign = (Map<String, Object>) yamlMap.get("sign");
         Map<String, Object> gateway = (Map<String, Object>) sign.get("gateway");
         this.port = (int) gateway.get("port");
         this.handler = String.valueOf(gateway.get("handler"));
+        System.out.println("outbound处理方式为："+this.handler);
         this.strategy = String.valueOf(gateway.get("strategy"));
+        System.out.println("负载均衡策略为："+this.strategy);
         List<Map<String, String>> requestSourceFilters = (ArrayList<Map<String, String>>) gateway.get("requestFilters");
         List<FilterDefinition> requestFilterDefinitionList = requestSourceFilters.stream().map(this::parseFilter).collect(Collectors.toList());
         for (FilterDefinition filterDefinition : requestFilterDefinitionList) {
@@ -57,7 +54,6 @@ public class GatewayProperties {
                 this.requestFilters.put(filterDefinition.getName(), filterDefinition);
             }
         }
-//        System.out.println(this.requestFilters);
         List<Map<String, String>> responseSourceFilters = (ArrayList<Map<String, String>>) gateway.get("responseFilters");
         List<FilterDefinition> responseFilterDefinitionList = responseSourceFilters.stream().map(this::parseFilter).collect(Collectors.toList());
         for (FilterDefinition filterDefinition : responseFilterDefinitionList) {
@@ -67,9 +63,10 @@ public class GatewayProperties {
                 this.responseFilters.put(filterDefinition.getName(), filterDefinition);
             }
         }
-//        System.out.println(this.responseFilters);
         List<Map<String, Object>> sourceRoutes = (ArrayList<Map<String, Object>>) gateway.get("routes");
         List<RouteDefinition> routeList = sourceRoutes.stream().map(this::parseRoute).collect(Collectors.toList());
+        System.out.println("简略路由表信息：");
+        System.out.println("路由id\t\t链接\t\t匹配规则");
         for (RouteDefinition routeDefinition : routeList) {
             if (null == routeDefinition.getRequestFilter() || null == routeDefinition.getResponseFilter()) {
                 throw new NoSuchFilterDefinitionException("The route is configured with a non-existent filter");
@@ -77,9 +74,9 @@ public class GatewayProperties {
             if (this.routes.containsKey(routeDefinition.getId())) {
                 throw new NoUniqueRouteDefinitionException("route repeat");
             }
+            System.out.println(routeDefinition.getId()+"\t\t"+routeDefinition.getUri()+"\t\t"+routeDefinition.getPredicates());
             this.routes.put(routeDefinition.getId(), routeDefinition);
         }
-//        System.out.println(this);
     }
 
     private FilterDefinition parseFilter(Map<String, String> map) {
@@ -94,7 +91,7 @@ public class GatewayProperties {
         routeDefinition.setId(String.valueOf(map.get("id")));
         routeDefinition.setUri(String.valueOf(map.get("uri")));
         String uri = String.valueOf(map.get("uri"));
-        uri = uri.endsWith("/")?uri.substring(0,uri.length()-1):uri;
+        uri = uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
         routeDefinition.setUri(uri);
         routeDefinition.setServerName(String.valueOf(map.get("serverName")));
         routeDefinition.setRequestFilter(this.requestFilters.get(String.valueOf(map.get("requestFilter"))));
@@ -107,47 +104,8 @@ public class GatewayProperties {
 
 
     private String parsePredicates(Map<String, String> map) {
-        String path =  map.get("path");
-        path = path.endsWith("/")?path.substring(0,path.length()-1):path;
+        String path = map.get("path");
+        path = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
         return path;
-    }
-
-
-    public RouteDefinition getRouteByRequestUri(String uri){
-        List<RouteDefinition> res = new ArrayList<>();
-        for(Map.Entry<String, RouteDefinition> entry : routes.entrySet()){
-            RouteDefinition routeDefinition = entry.getValue();
-            AntPathMatcher antPathMatcher = new AntPathMatcher();
-            List<String> patternPathList = routeDefinition.getPredicates();
-            for(String pattern : patternPathList){
-                boolean march = antPathMatcher.match(pattern,uri);
-                if(march == true){
-                    res.add(routeDefinition);
-                    break;
-                }
-            }
-        }
-        if(strategy.equals(POLLING_STRATEGY)){
-            return getRouteByPollingStrategy(res);
-        }else {
-            return getRouteByRandomStrategy(res);
-        }
-    }
-
-    private RouteDefinition getRouteByRandomStrategy(List<RouteDefinition> routeDefinitionList){
-        if(routeDefinitionList.size() == 0){
-            return null;
-        }
-        Random r = new Random(System.currentTimeMillis());
-        int ran = r.nextInt(routeDefinitionList.size());
-        return routeDefinitionList.get(ran);
-    }
-
-    private RouteDefinition getRouteByPollingStrategy(List<RouteDefinition> routeDefinitionList){
-        if(routeDefinitionList.size() == 0){
-            return null;
-        }
-        routeDefinitionList.sort(Comparator.comparingInt(RouteDefinition::getCount));
-        return routeDefinitionList.get(0);
     }
 }
