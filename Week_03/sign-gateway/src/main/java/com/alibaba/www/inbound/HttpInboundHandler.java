@@ -48,7 +48,7 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
         try {
             FullHttpRequest fullHttpRequest = (FullHttpRequest) msg;
             String uri = formatUri(fullHttpRequest.uri());
-            System.out.println("收到请求：" + uri);
+            System.out.println("\n收到请求：" + uri);
             //动态代理 路由
             ProxyFactory routeProxyFactory = ProxyFactoryUtil.getEndpointRouterProxyFactory(gatewayProperties, uri);
             //根据正则匹配及负载均衡策略命中一个路由
@@ -75,7 +75,6 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void handleWithRoute(ChannelHandlerContext ctx,FullHttpRequest fullHttpRequest,RouteDefinition routeDefinition,String uri) throws Exception{
-        System.out.println();
         System.out.println("匹配成功，" + uri + "命中路由为：");
         System.out.println("路由id\t\t链接\t\t匹配规则\t\trequest拦截器\t\tresponse拦截器");
         System.out.println(routeDefinition.getId() + "\t\t" + routeDefinition.getUri() + "\t\t" + routeDefinition.getPredicates() + "\t\t" + routeDefinition.getRequestFilter().getSig() + "\t\t" + routeDefinition.getResponseFilter().getSig());
