@@ -10,6 +10,6 @@ package com.alibaba.www.exception;
 public class NoUniqueRouteDefinitionException extends Exception {
 
     public NoUniqueRouteDefinitionException(String message) {
-        super();
+        super(message);
     }
 }
