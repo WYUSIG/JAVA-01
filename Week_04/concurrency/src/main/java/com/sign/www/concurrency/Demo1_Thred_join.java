@@ -1,6 +1,6 @@
 package com.sign.www.concurrency;
 
-public class Demo1 {
+public class Demo1_Thred_join {
 
     private static volatile int data = 0;
 

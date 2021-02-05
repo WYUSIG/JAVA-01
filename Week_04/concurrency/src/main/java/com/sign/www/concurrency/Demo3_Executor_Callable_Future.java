@@ -2,7 +2,7 @@ package com.sign.www.concurrency;
 
 import java.util.concurrent.*;
 
-public class Demo3 {
+public class Demo3_Executor_Callable_Future {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         int core = Runtime.getRuntime().availableProcessors();
@@ -15,6 +15,7 @@ public class Demo3 {
         Future<Integer> result = service.submit(new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
+                Thread.sleep(1500);
                 return 1;
             }
         });
