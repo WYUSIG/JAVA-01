@@ -9,8 +9,8 @@ public class Demo3_Executor_Callable_Future {
         int keepAliveTime = 2000;
         int queueSize = 2048;
         RejectedExecutionHandler handler = new ThreadPoolExecutor.CallerRunsPolicy();
-        ExecutorService service = new ThreadPoolExecutor(core,core,
-                keepAliveTime,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<>(queueSize),
+        ExecutorService service = new ThreadPoolExecutor(core, core,
+                keepAliveTime, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(queueSize),
                 handler);
         Future<Integer> result = service.submit(new Callable<Integer>() {
             @Override

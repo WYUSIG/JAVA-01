@@ -5,7 +5,7 @@ public class Demo1_Thred_join {
     private static volatile int data = 0;
 
     public static void main(String[] args) throws InterruptedException {
-        Thread thread = new Thread(()->{
+        Thread thread = new Thread(() -> {
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException e) {

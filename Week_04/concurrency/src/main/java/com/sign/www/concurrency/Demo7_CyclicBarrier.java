@@ -14,9 +14,9 @@ public class Demo7_CyclicBarrier {
 
     private static volatile int i = 0;
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
-        new Thread(()->{
+        new Thread(() -> {
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException e) {

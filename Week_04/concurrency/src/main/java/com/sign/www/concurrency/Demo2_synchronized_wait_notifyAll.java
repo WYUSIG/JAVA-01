@@ -9,17 +9,16 @@ public class Demo2_synchronized_wait_notifyAll {
     public static void main(String[] args) throws InterruptedException {
         Thread thread = new Thread(new MyRunable());
         thread.start();
-        synchronized (oo){
+        synchronized (oo) {
             oo.wait();
             System.out.println(data);
         }
     }
 
-    static class MyRunable implements Runnable{
-
+    static class MyRunable implements Runnable {
         @Override
         public void run() {
-            synchronized (oo){
+            synchronized (oo) {
                 try {
                     Thread.sleep(1500);
                 } catch (InterruptedException e) {

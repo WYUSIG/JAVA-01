@@ -1,24 +1,21 @@
 package com.sign.www.concurrency;
 
-
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @ClassName Demo8
+ * @ClassName Demo10
  * @Description: TODO
  * @Author 钟显东
- * @Date 2021/2/5 0005
+ * @Date 2021/2/6 0006
  * @Version V1.0
  **/
-public class Demo8_ReentrantLock_Condition {
+public class Demo10_ReentrantLock_isLocked {
 
     private static volatile int i = 0;
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) {
         ReentrantLock lock = new ReentrantLock();
-        Condition condition = lock.newCondition();
-        new Thread(()->{
+        new Thread(() -> {
             lock.lock();
             try {
                 Thread.sleep(1500);
@@ -26,12 +23,13 @@ public class Demo8_ReentrantLock_Condition {
                 e.printStackTrace();
             }
             i = 1;
-            condition.signalAll();
             lock.unlock();
         }).start();
 
+        while (!lock.isLocked()) {
+
+        }
         lock.lock();
-        condition.await();
         System.out.println(i);
         lock.unlock();
     }
