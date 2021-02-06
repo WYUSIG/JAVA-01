@@ -2,20 +2,13 @@ package com.sign.www.concurrency;
 
 import java.util.concurrent.CyclicBarrier;
 
-/**
- * @ClassName Demo7
- * @Description: TODO
- * @Author 钟显东
- * @Date 2021/2/5 0005
- * @Version V1.0
- **/
-public class Demo7_CyclicBarrier {
+public class Demo15_CyclicBarrier_getNumberWaiting_Daemon {
 
     private static volatile int i = 0;
 
     public static void main(String[] args) throws Exception {
         CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
-        new Thread(() -> {
+        Thread thread = new Thread(() -> {
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException e) {
@@ -27,8 +20,12 @@ public class Demo7_CyclicBarrier {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }).start();
-        cyclicBarrier.await();
+        });
+        thread.setDaemon(true);
+        thread.start();
+        while (cyclicBarrier.getNumberWaiting() == 0){
+
+        }
         System.out.println(i);
     }
 }

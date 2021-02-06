@@ -2,7 +2,9 @@ package com.sign.www.concurrency;
 
 import java.util.concurrent.*;
 
-public class Demo3_Executor_Callable_Future {
+public class Demo13_Executor_Future_submit_Runnable_result {
+
+    private static volatile int i = 0;
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         int core = Runtime.getRuntime().availableProcessors();
@@ -12,15 +14,20 @@ public class Demo3_Executor_Callable_Future {
         ExecutorService service = new ThreadPoolExecutor(core, core,
                 keepAliveTime, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(queueSize),
                 handler);
-        Future<Integer> result = service.submit(new Callable<Integer>() {
+        Future<Integer> result = service.submit(new Runnable() {
             @Override
-            public Integer call() throws Exception {
-                Thread.sleep(1500);
-                return 1;
+            public void run() {
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                i = 1;
             }
-        });
-        int data = result.get();
-        System.out.println(data);
+        },1);
+        if(result.get() == 1){
+            System.out.println(i);
+        }
         service.shutdown();
     }
 }

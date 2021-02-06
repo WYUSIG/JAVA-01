@@ -31,8 +31,11 @@ public class Demo8_Lock_Condition {
         }).start();
 
         lock.lock();
-        condition.await();
-        System.out.println(i);
-        lock.unlock();
+        try{
+            condition.await();
+            System.out.println(i);
+        }finally {
+            lock.unlock();
+        }
     }
 }
