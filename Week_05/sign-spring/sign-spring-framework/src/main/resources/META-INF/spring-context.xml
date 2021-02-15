@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:student="http://www.w3.org/schema/student"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.w3.org/schema/student
+        http://www.w3.org/schema/student.xsd">
+    <context:component-scan base-package="io.sign.www.spring.pojo"/>
+    <bean id="student1" class="io.sign.www.spring.pojo.Student" scope="prototype">
+        <constructor-arg name="id" value="1"/>
+        <constructor-arg name="name" value="xml配置方式"/>
+    </bean>
+    <student:student id="4" name="xml扩展加载"/>
+</beans>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.w3.org/schema/student"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.w3.org/schema/student">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+
+    <!-- 定义 Student 类型（复杂类型） -->
+    <xsd:complexType name="Student">
+        <xsd:attribute name="id" type="xsd:int" use="required"/>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <!-- 定义 student 元素 -->
+    <xsd:element name="student" type="Student"/>
+</xsd:schema>
