@@ -14,7 +14,8 @@
 	<modules>
 		<module>sign-spring-boot-starter</module>
 		<module>spring-boot-demo</module>
-	</modules>
+        <module>java-jdbc</module>
+    </modules>
 	<dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
