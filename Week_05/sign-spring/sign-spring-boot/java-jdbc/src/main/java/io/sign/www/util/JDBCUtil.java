@@ -79,6 +79,18 @@ public class JDBCUtil {
         }
     }
 
+    // 关闭资源
+    public static void closeResource(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
     // 回滚操作
     public static void rollBack(Connection conn) {
         if (conn != null) {

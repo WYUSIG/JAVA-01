@@ -15,7 +15,9 @@
 		<module>sign-spring-boot-starter</module>
 		<module>spring-boot-demo</module>
         <module>java-jdbc</module>
-    </modules>
+        <module>spring-boot-hikari-jpa</module>
+		<module>spring-boot-hikari-mybatis</module>
+	</modules>
 	<dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

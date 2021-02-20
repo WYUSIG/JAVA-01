@@ -18,7 +18,7 @@ public class JDBCDemo {
     private static Connection connection;
     private static Statement statement;
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) {
         try {
             connection = JDBCUtil.getConnection();
             statement = connection.createStatement();
@@ -30,34 +30,34 @@ public class JDBCDemo {
             delete();
             System.out.println("第二次查询");
             query();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
-            JDBCUtil.closeResource(statement,connection);
+        } finally {
+            JDBCUtil.closeResource(statement, connection);
         }
     }
 
-    public static void insert() throws Exception{
+    public static void insert() throws Exception {
         String sql = "INSERT INTO student(name) VALUES('钟显东')";
         statement.execute(sql);
     }
 
-    public static void query() throws Exception{
+    public static void query() throws Exception {
         String sql = "SELECT * FROM student";
         ResultSet resultSet = statement.executeQuery(sql);
-        while(resultSet.next()) {
+        while (resultSet.next()) {
             Integer id = resultSet.getInt("id");
             String name = resultSet.getString("name");
-            System.out.println("id:"+id+",name:"+name);
+            System.out.println("id:" + id + ",name:" + name);
         }
     }
 
-    public static void update() throws Exception{
+    public static void update() throws Exception {
         String sql = "UPDATE student SET name = 'zxd' WHERE id = 5";
         statement.execute(sql);
     }
 
-    public static void delete() throws Exception{
+    public static void delete() throws Exception {
         String sql = "DELETE FROM student WHERE id = 6";
         statement.execute(sql);
     }
