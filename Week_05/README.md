@@ -131,7 +131,7 @@
       private Singleton_04() {
       }
   
-      public static synchronized Singleton_04 getInstance() {
+      public static Singleton_04 getInstance() {
           return SingletonHolder.instance;
       }
   }
