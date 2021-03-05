@@ -32,7 +32,6 @@
 >relay_log_info_repository=TABLE
 >binlog_checksum=NONE
 >log_slave_updates=ON
->binlog_format=ROW
 >
 >transaction_write_set_extraction=XXHASH64
 >loose-group_replication_group_name="3db33b36-0e51-409f-a61d-c99756e90155"
@@ -57,6 +56,23 @@
 >sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES 
 >log_bin=mysql-bin
 >binlog-format=Row
+>
+>gtid_mode=ON
+>enforce_gtid_consistency=ON
+>master_info_repository=TABLE
+>relay_log_info_repository=TABLE
+>binlog_checksum=NONE
+>log_slave_updates=ON
+>
+>transaction_write_set_extraction=XXHASH64
+>loose-group_replication_group_name="3db33b36-0e51-409f-a61d-c99756e90155"
+>loose-group_replication_start_on_boot=off
+>loose-group_replication_local_address= "192.168.1.91:3326"
+>loose-group_replication_group_seeds= "192.168.1.91:3316,192.168.1.91:3336"
+>loose-group_replication_bootstrap_group= off
+>
+>loose-group_replication_single_primary_mode=off
+>loose-group_replication_enforce_update_everywhere_checks=on
 
 ##### 修改mysql-5.7.33-winx64-3的my.ini
 
@@ -71,6 +87,23 @@
 >sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES 
 >log_bin=mysql-bin
 >binlog-format=Row
+>
+>gtid_mode=ON
+>enforce_gtid_consistency=ON
+>master_info_repository=TABLE
+>relay_log_info_repository=TABLE
+>binlog_checksum=NONE
+>log_slave_updates=ON
+>
+>transaction_write_set_extraction=XXHASH64
+>loose-group_replication_group_name="3db33b36-0e51-409f-a61d-c99756e90155"
+>loose-group_replication_start_on_boot=off
+>loose-group_replication_local_address= "192.168.1.91:3336"
+>loose-group_replication_group_seeds= "192.168.1.91:3316,192.168.1.91:3326"
+>loose-group_replication_bootstrap_group= off
+>
+>loose-group_replication_single_primary_mode=off
+>loose-group_replication_enforce_update_everywhere_checks=on
 
 ##### 初始化并启动mysql-5.7.33-winx64-1
 
@@ -108,24 +141,86 @@
 >
 >mysql -uroot -hlocalhost -P3336
 
-##### 分别在3个数据库实例上安装组复制插件group_replication.dll
+##### 配置主节点mysql-5.7.33-winx64-1
 
+>set sql_log_bin = 0;
+>
+>//select user,host from mysql.user;查看已创建用户，已创建则不需要再创建
+>
+>CREATE USER 'repl'@'%' IDENTIFIED BY '123456';
+>
+>grant replication slave on *.* to repl@'%';
+>
+>flush privileges;
+>
+>set sql_log_bin = 1;
+>
+>change master to master_user='repl', master_password='123456' for channel 'group_replication_recovery';
+>
 >install plugin group_replication soname 'group_replication.dll';
 >
->exit;
+>set global group_replication_bootstrap_group = on;
 >
->重启mysql server,关闭掉start mysqld自动起的窗口再start mysqld
+>start group_replication;
 >
->start mysqld
+>select * from performance_schema.replication_group_members;
 >
->mysql -uroot -hlocalhost -P3316
->
->//验证是否安装成功
->
->show variables like '%group%';
+>set global group_replication_bootstrap_group = off;
 
-##### 准备组复制第一个节点mysql-5.7.33-winx64-1
+##### 配置从节点mysql-5.7.33-winx64-2
 
+>set sql_log_bin = 0;
 >
+>//select user,host from mysql.user;查看已创建用户，已创建则不需要再创建
 >
+>CREATE USER 'repl'@'%' IDENTIFIED BY '123456';
 >
+>grant replication slave on *.* to repl@'%';
+>
+>install plugin group_replication soname 'group_replication.dll';
+>
+>set sql_log_bin =1;
+>
+>change master to master_user='repl', master_password='123456' for channel 'group_replication_recovery';
+>
+>start group_replication;
+>
+>select * from performance_schema.replication_group_members;
+
+##### 配置从节点mysql-5.7.33-winx64-3
+
+>set sql_log_bin = 0;
+>
+>//select user,host from mysql.user;查看已创建用户，已创建则不需要再创建
+>
+>CREATE USER 'repl'@'%' IDENTIFIED BY '123456';
+>
+>grant replication slave on *.* to repl@'%';
+>
+>install plugin group_replication soname 'group_replication.dll';
+>
+>set sql_log_bin =1;
+>
+>change master to master_user='repl', master_password='123456' for channel 'group_replication_recovery';
+>
+>start group_replication;
+>
+>select * from performance_schema.replication_group_members;
+
+##### 验证
+
+>//在主节点mysql-5.7.33-winx64-1上执行
+>
+>create schema db;
+>
+>//组复制如果一个表没有主键，那么就插入不了数据
+>
+>create table t1(id int primary key);
+>
+>insert into t1 values(1),(2);
+>
+>//在其他节点执行，看看数据有没有同步
+>
+>use db;
+>
+>select * from t1;
