@@ -63,7 +63,9 @@
 
 >//建议一个数据库实例一个命令行窗口
 >
->cd 进入mysql-5.7.33-winx64-1的bin目录
+>cd 进入mysql-5.7.33-winx64-1的bin目录，如果使用powershell需要./mysqld --defaults-file=../my.ini --initialize-insecure
+>
+>
 >
 >mysqld --defaults-file=../my.ini --initialize-insecure
 >

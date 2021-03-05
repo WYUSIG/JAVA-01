@@ -42,7 +42,9 @@
 
 ##### 初始化和启动数据库mysql-5.7.33-winx64-1
 
->cd 进入mysql-5.7.33-winx64-1的bin目录
+>cd 进入mysql-5.7.33-winx64-1的bin目录，如果使用powershell需要./mysqld --defaults-file=../my.ini --initialize-insecure
+>
+>
 >
 >mysqld --defaults-file=../my.ini --initialize-insecure
 >
