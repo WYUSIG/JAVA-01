@@ -66,40 +66,41 @@
 > query-with-cipher-column: false
 > sql-show: true
 > check-table-metadata-enabled: false
+>
 >```
 
 #### config-replica-query.yaml文件配置
 
 >```
->schemaName: replica_query_db
+>schemaName: replica-query_db
 >
 >dataSourceCommon:
-> username: root
-> password: kIo9u7Oi0eg
-> connectionTimeoutMilliseconds: 30000
-> idleTimeoutMilliseconds: 60000
-> maxLifetimeMilliseconds: 1800000
-> maxPoolSize: 10
-> minPoolSize: 1
-> maintenanceIntervalMilliseconds: 30000
+>  username: root
+>  password:
+>  connectionTimeoutMilliseconds: 30000
+>  idleTimeoutMilliseconds: 60000
+>  maxLifetimeMilliseconds: 1800000
+>  maxPoolSize: 10
+>  minPoolSize: 1
+>  maintenanceIntervalMilliseconds: 30000
 >
 >dataSources:
-> primary_ds:
->   url: jdbc:mysql://127.0.0.1:3316/replica-query_db?serverTimezone=UTC&useSSL=false
-> replica_ds_0:
->   url: jdbc:mysql://127.0.0.1:3326/replica-query_db?serverTimezone=UTC&useSSL=false
-> replica_ds_1:
->   url: jdbc:mysql://127.0.0.1:3336/replica-query_db?serverTimezone=UTC&useSSL=false
+>  primary_ds:
+>      url: jdbc:mysql://127.0.0.1:3316/replica-query_db?serverTimezone=UTC&useSSL=false
+>  replica_ds_0:
+>      url: jdbc:mysql://127.0.0.1:3326/replica-query_db?serverTimezone=UTC&useSSL=false
+>  replica_ds_1:
+>      url: jdbc:mysql://127.0.0.1:3336/replica-query_db?serverTimezone=UTC&useSSL=false
 >
 >rules:
 >- !REPLICA_QUERY
-> dataSources:
->   pr_ds:
->     name: pr_ds
->     primaryDataSourceName: primary_ds
->     replicaDataSourceNames:
->       - replica_ds_0
->       - replica_ds_1       
+>  dataSources:
+>    pr_ds:
+>      name: pr_ds
+>      primaryDataSourceName: primary_ds
+>      replicaDataSourceNames:
+>        - replica_ds_0
+>        - replica_ds_1      
 >```
 >
 >注意修改dataSourceCommon.password，dataSources的数据库链接
