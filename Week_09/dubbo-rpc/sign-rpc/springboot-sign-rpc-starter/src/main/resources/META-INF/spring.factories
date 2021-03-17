@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  
+io.sign.www.rpc.configuration.SignRpcProperties,\
+io.sign.www.rpc.configuration.SignRpcConfiguration

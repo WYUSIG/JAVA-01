@@ -1,0 +1,44 @@
+{"groups":[
+  {
+    "name": "spring.sign.rpc",
+    "type": "io.sign.www.rpc.configuration.SignRpcProperties",
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+  }
+],"properties":[
+  {
+    "name": "spring.sign.rpc.nacosAddress",
+    "type": "java.lang.String",
+    "defaultValue": "192.168.1.91:8848",
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+  },
+  {
+    "name": "spring.sign.rpc.type",
+    "type": "java.lang.String",
+    "defaultValue": "192.168.1.91:8848",
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+  },
+  {
+    "name": "spring.sign.rpc.providerIp",
+    "type": "java.lang.String",
+    "defaultValue": "192.168.1.91",
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+  },
+  {
+    "name": "spring.sign.rpc.providerPort",
+    "type": "java.lang.Integer",
+    "defaultValue": "8181",
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+  }
+],"hints": [
+  {
+    "name": "spring.sign.rpc.type",
+    "values": [
+      {
+        "value": "provider"
+      },
+      {
+        "value": "consumer"
+      }
+    ]
+  }
+]}

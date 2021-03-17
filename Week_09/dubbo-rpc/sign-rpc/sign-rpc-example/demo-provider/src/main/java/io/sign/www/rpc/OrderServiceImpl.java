@@ -1,5 +1,6 @@
 package io.sign.www.rpc;
 
+import io.sign.www.rpc.annotation.SignRpcService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
  * @since 1.0
  **/
 @Service(value = "io.sign.www.rpc.OrderService")
+@SignRpcService
 public class OrderServiceImpl implements OrderService{
 
     @Override
