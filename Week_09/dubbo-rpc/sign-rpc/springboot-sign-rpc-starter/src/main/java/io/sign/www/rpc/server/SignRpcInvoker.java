@@ -6,6 +6,7 @@ import io.sign.www.rpc.api.DefaultSignRpcResolver;
 import io.sign.www.rpc.api.SignRpcRequest;
 import io.sign.www.rpc.api.SignRpcResolver;
 import io.sign.www.rpc.api.SignRpcResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -20,7 +21,8 @@ import java.util.Arrays;
 @Component
 public class SignRpcInvoker {
 
-    private SignRpcResolver resolver = new DefaultSignRpcResolver();
+    @Autowired
+    private SignRpcResolver resolver;
 
     public SignRpcInvoker(){}
 

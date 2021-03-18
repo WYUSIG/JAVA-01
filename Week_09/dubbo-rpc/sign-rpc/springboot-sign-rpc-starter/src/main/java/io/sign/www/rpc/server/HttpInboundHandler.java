@@ -10,7 +10,7 @@ import io.netty.util.CharsetUtil;
 import io.sign.www.rpc.api.SignRpcRequest;
 import io.sign.www.rpc.api.SignRpcResponse;
 import io.sign.www.rpc.configuration.SignRpcProperties;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import static io.sign.www.rpc.configuration.SignRpcConfiguration.TYPE_PROVIDER;
@@ -18,10 +18,20 @@ import static io.sign.www.rpc.configuration.SignRpcConfiguration.TYPE_PROVIDER;
 @Component
 public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
 
-    @Autowired
+    private static ApplicationContext applicationContext;
+
     private SignRpcInvoker invoker;
-    @Autowired
+
     private SignRpcProperties signRpcProperties;
+
+    public HttpInboundHandler() {
+        this.invoker = (SignRpcInvoker) applicationContext.getBean(SignRpcInvoker.class);
+        this.signRpcProperties = (SignRpcProperties) applicationContext.getBean(SignRpcProperties.class);
+    }
+
+    public static void setApplicationContext(ApplicationContext ac) {
+        applicationContext = ac;
+    }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
@@ -37,7 +47,7 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
             if (signRpcProperties.getType().equals(TYPE_PROVIDER)) {
                 handleByProvider(ctx, requestJsonStr);
             } else {
-                handleByConsumer(ctx,requestJsonStr);
+                handleByConsumer(ctx, requestJsonStr);
             }
 
         } catch (Exception e) {

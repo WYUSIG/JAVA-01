@@ -1,37 +1,47 @@
 {"groups":[
   {
-    "name": "spring.sign.rpc",
+    "name": "sign.rpc",
     "type": "io.sign.www.rpc.configuration.SignRpcProperties",
     "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
   }
 ],"properties":[
   {
-    "name": "spring.sign.rpc.nacosAddress",
+    "name": "sign.rpc.nacosAddress",
     "type": "java.lang.String",
     "defaultValue": "192.168.1.91:8848",
     "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
   },
   {
-    "name": "spring.sign.rpc.type",
+    "name": "sign.rpc.type",
     "type": "java.lang.String",
     "defaultValue": "192.168.1.91:8848",
     "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
   },
   {
-    "name": "spring.sign.rpc.providerIp",
+    "name": "sign.rpc.providerIp",
     "type": "java.lang.String",
     "defaultValue": "192.168.1.91",
     "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
   },
   {
-    "name": "spring.sign.rpc.providerPort",
+    "name": "sign.rpc.providerPort",
     "type": "java.lang.Integer",
     "defaultValue": "8181",
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+  },
+  {
+    "name": "sign.rpc.consumer",
+    "type": "io.sign.www.rpc.ConsumerProperties",
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+  },
+  {
+    "name": "sign.rpc.consumer.services",
+    "type": "java.util.List",
     "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
   }
 ],"hints": [
   {
-    "name": "spring.sign.rpc.type",
+    "name": "sign.rpc.type",
     "values": [
       {
         "value": "provider"

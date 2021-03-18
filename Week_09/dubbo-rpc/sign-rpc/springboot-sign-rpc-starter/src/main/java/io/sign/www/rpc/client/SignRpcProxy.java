@@ -7,6 +7,7 @@ import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import io.sign.www.rpc.api.SignRpcRequest;
 import io.sign.www.rpc.api.SignRpcResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -29,6 +30,7 @@ import java.util.concurrent.Future;
  * @author sign
  * @since 1.0
  **/
+@Slf4j
 public class SignRpcProxy {
 
     private static CloseableHttpAsyncClient httpClient;
@@ -36,12 +38,12 @@ public class SignRpcProxy {
     private static String nacosAddress = null;
 
     static {
-        ParserConfig.getGlobalInstance().addAccept("io.kimmking");
+        ParserConfig.getGlobalInstance().addAccept("*");
 
         int cores = Runtime.getRuntime().availableProcessors();
         IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
-                .setConnectTimeout(1000)
-                .setSoTimeout(1000)
+                .setConnectTimeout(10000)
+                .setSoTimeout(10000)
                 .setIoThreadCount(cores)
                 .setRcvBufSize(32 * 1024)
                 .build();
@@ -60,7 +62,6 @@ public class SignRpcProxy {
     public static <T> T create(final Class<T> serviceClass) {
         return (T) Proxy.newProxyInstance(SignRpcProxy.class.getClassLoader(), new Class[]{serviceClass},
                 new RpcfxInvocationHandler(serviceClass));
-
     }
 
     public static class RpcfxInvocationHandler implements InvocationHandler {
@@ -80,7 +81,7 @@ public class SignRpcProxy {
             request.setParams(params);
 
             NamingService naming = NacosFactory.createNamingService(SignRpcProxy.nacosAddress);
-            List<Instance> instanceList = naming.getAllInstances(serviceClass.getName());
+            List<Instance> instanceList = naming.getAllInstances(serviceClass.getName(),"SignRpc");
             if (instanceList.size() == 0) {
                 throw new Exception("没有可用服务："+serviceClass.getName());
             }
@@ -93,6 +94,7 @@ public class SignRpcProxy {
             String url = "http://"+ ip + ":"+port;
             String reqJson = JSON.toJSONString(req);
             System.out.println("req json: "+reqJson);
+            log.info("发送请求："+url);
 
             HttpPost httpPost = new HttpPost(url);
             StringEntity entity = new StringEntity(reqJson, "UTF-8");

@@ -1,10 +1,12 @@
-spring:
-  sign:
-    rpc:
-      nacosAddress: "192.168.1.91:8848"
-      providerIp: "192.168.1.91"
-      providerPort: 8182
-      type: consumer
-      serverName: "demo-consumer"
+sign:
+  rpc:
+    nacosAddress: "192.168.1.91:8848"
+    providerIp: "192.168.1.91"
+    providerPort: 8182
+    type: consumer
+    consumer:
+      services:
+        - "io.sign.www.rpc.UserService"
+        - "io.sign.www.rpc.OrderService"
 server:
   port: 8888

@@ -1,6 +1,6 @@
 package io.sign.www.rpc.client;
 
-import io.sign.www.rpc.annotation.SignRpcInject;
+//import io.sign.www.rpc.annotation.SignRpcInject;
 import io.sign.www.rpc.configuration.SignRpcProperties;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeansException;
@@ -32,12 +32,12 @@ public class MyBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
     @SneakyThrows
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition();
-        Class clazz = Class.forName("io.sign.www.rpc.UserService");
-        beanDefinitionBuilder.setFactoryMethod(SignRpcProxy.create(clazz));
-        BeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
-//非命名方式
-        BeanDefinitionReaderUtils.registerWithGeneratedName(beanDefinition,applicationContext);
+//        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition();
+//        Class clazz = Class.forName("io.sign.www.rpc.UserService");
+//        beanDefinitionBuilder.setFactoryMethod(SignRpcProxy.create(clazz));
+//        BeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
+////非命名方式
+//        BeanDefinitionReaderUtils.registerWithGeneratedName(beanDefinition,applicationContext);
 //        Iterator<String> iterator = beanFactory.getBeanNamesIterator();
 //        while (iterator.hasNext()) {
 //            String beanName = iterator.next();
