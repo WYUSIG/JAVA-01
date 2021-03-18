@@ -6,38 +6,41 @@
   }
 ],"properties":[
   {
-    "name": "sign.rpc.nacosAddress",
-    "type": "java.lang.String",
-    "defaultValue": "192.168.1.91:8848",
-    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
-  },
-  {
     "name": "sign.rpc.type",
     "type": "java.lang.String",
-    "defaultValue": "192.168.1.91:8848",
-    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties",
+    "deprecation": "provider or consumer"
   },
   {
-    "name": "sign.rpc.providerIp",
+    "name": "sign.rpc.rpcIp",
     "type": "java.lang.String",
-    "defaultValue": "192.168.1.91",
-    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties",
+    "deprecation": "服务提供者 RPC IP"
   },
   {
-    "name": "sign.rpc.providerPort",
+    "name": "sign.rpc.rpcPort",
     "type": "java.lang.Integer",
     "defaultValue": "8181",
-    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties",
+    "deprecation": "服务提供者 RPC 端口"
   },
   {
-    "name": "sign.rpc.consumer",
-    "type": "io.sign.www.rpc.ConsumerProperties",
-    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+    "name": "sign.rpc.nacos",
+    "type": "io.sign.www.rpc.configuration.NacosProperties",
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties",
+    "deprecation": "nacos 配置信息"
   },
   {
-    "name": "sign.rpc.consumer.services",
-    "type": "java.util.List",
-    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties"
+    "name": "sign.rpc.nacos.address",
+    "type": "java.lang.String",
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties",
+    "deprecation": "nacos 地址"
+  },
+  {
+    "name": "sign.rpc.nacos.group",
+    "type": "java.lang.String",
+    "sourceType": "io.sign.www.rpc.configuration.SignRpcProperties",
+    "deprecation": "nacos 分组，相同分组的服务消费者和提供者会匹配"
   }
 ],"hints": [
   {

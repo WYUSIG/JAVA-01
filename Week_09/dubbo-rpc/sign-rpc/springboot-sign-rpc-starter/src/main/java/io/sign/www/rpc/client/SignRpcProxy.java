@@ -7,6 +7,7 @@ import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import io.sign.www.rpc.api.SignRpcRequest;
 import io.sign.www.rpc.api.SignRpcResponse;
+import io.sign.www.rpc.configuration.NacosProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -18,6 +19,7 @@ import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.util.EntityUtils;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -35,10 +37,10 @@ public class SignRpcProxy {
 
     private static CloseableHttpAsyncClient httpClient;
 
-    private static String nacosAddress = null;
+    private static NacosProperties nacos = null;
 
     static {
-        ParserConfig.getGlobalInstance().addAccept("*");
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
 
         int cores = Runtime.getRuntime().availableProcessors();
         IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
@@ -47,7 +49,7 @@ public class SignRpcProxy {
                 .setIoThreadCount(cores)
                 .setRcvBufSize(32 * 1024)
                 .build();
-        httpClient = HttpAsyncClients.custom().setMaxConnTotal(40)
+        httpClient = HttpAsyncClients.custom().setMaxConnTotal(50)
                 .setMaxConnPerRoute(8)
                 .setDefaultIOReactorConfig(ioReactorConfig)
                 .setKeepAliveStrategy((response, context) -> 6000)
@@ -55,8 +57,8 @@ public class SignRpcProxy {
         httpClient.start();
     }
 
-    public static void setNacosAddress(String nacosAddress) {
-        SignRpcProxy.nacosAddress = nacosAddress;
+    public static void setNacosAddress(NacosProperties nacos) {
+        SignRpcProxy.nacos = nacos;
     }
 
     public static <T> T create(final Class<T> serviceClass) {
@@ -80,10 +82,10 @@ public class SignRpcProxy {
             request.setMethod(method.getName());
             request.setParams(params);
 
-            NamingService naming = NacosFactory.createNamingService(SignRpcProxy.nacosAddress);
-            List<Instance> instanceList = naming.getAllInstances(serviceClass.getName(),"SignRpc");
+            NamingService naming = NacosFactory.createNamingService(nacos.getAddress());
+            List<Instance> instanceList = naming.getAllInstances(serviceClass.getName(), nacos.getGroup());
             if (instanceList.size() == 0) {
-                throw new Exception("没有可用服务："+serviceClass.getName());
+                throw new Exception("没有可用服务：" + serviceClass.getName());
             }
             Instance instance = instanceList.get(0);
             SignRpcResponse response = post(request, instance.getIp(), instance.getPort());
@@ -91,10 +93,9 @@ public class SignRpcProxy {
         }
 
         private SignRpcResponse post(SignRpcRequest req, String ip, int port) throws Exception {
-            String url = "http://"+ ip + ":"+port;
+            String url = "http://" + ip + ":" + port;
             String reqJson = JSON.toJSONString(req);
-            System.out.println("req json: "+reqJson);
-            log.info("发送请求："+url);
+            log.info("发送rpc请求：" + req.getServiceClass());
 
             HttpPost httpPost = new HttpPost(url);
             StringEntity entity = new StringEntity(reqJson, "UTF-8");
@@ -118,14 +119,14 @@ public class SignRpcProxy {
                 }
             });
             HttpResponse endpointResponse = future.get();
-            if(endpointResponse.getStatusLine().getStatusCode() == 200) {
+            if (endpointResponse.getStatusLine().getStatusCode() == 200) {
                 HttpEntity httpEntity = endpointResponse.getEntity();
                 if (httpEntity != null) {
-                    String string =  EntityUtils.toString(httpEntity, "UTF-8");
+                    String string = EntityUtils.toString(httpEntity, "UTF-8");
                     return JSON.parseObject(string, SignRpcResponse.class);
                 }
             } else {
-                throw new Exception("rpc调用网络出错，code："+String.valueOf(endpointResponse.getStatusLine().getStatusCode()));
+                throw new Exception("rpc调用网络出错，code：" + String.valueOf(endpointResponse.getStatusLine().getStatusCode()));
             }
             return null;
         }

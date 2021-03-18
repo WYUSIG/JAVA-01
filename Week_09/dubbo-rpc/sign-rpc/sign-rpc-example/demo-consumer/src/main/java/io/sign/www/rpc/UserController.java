@@ -1,13 +1,14 @@
-package io.sign.www.rpc.controller;
+package io.sign.www.rpc;
 
-import io.sign.www.rpc.User;
-import io.sign.www.rpc.UserService;
 import io.sign.www.rpc.annotation.SignRpcReference;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 用户服务
+ * 用户 Controller
+ *
+ * @author sign
+ * @since 1.0
  **/
 @RestController
 @RequestMapping("/user")
@@ -18,6 +19,6 @@ public class UserController {
 
     @RequestMapping("/getUser")
     public User getUser(int id) {
-        return (User)userService.findById(id);
+        return userService.findById(id);
     }
 }

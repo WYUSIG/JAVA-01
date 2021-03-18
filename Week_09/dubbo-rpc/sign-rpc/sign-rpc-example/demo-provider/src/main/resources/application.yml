@@ -1,6 +1,10 @@
 sign:
   rpc:
-    nacosAddress: "192.168.1.91:8848"
-    providerIp: "192.168.1.91"
-    providerPort: 8181
     type: provider
+    rpcIp: "localhost"
+    rpcPort: 8181
+    nacos:
+      address: "localhost:8848"
+      group: "signRpc"
+server:
+  port: 8887

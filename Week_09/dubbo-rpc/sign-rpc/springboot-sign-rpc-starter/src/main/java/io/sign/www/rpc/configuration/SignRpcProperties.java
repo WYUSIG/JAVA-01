@@ -6,7 +6,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
@@ -26,39 +25,45 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class SignRpcProperties implements ApplicationContextAware {
 
-    private String nacosAddress;
-
+    /**
+     * @see SignRpcConfiguration#TYPE_PROVIDER
+     * @see SignRpcConfiguration#TYPE_CONSUMER
+     * 区别在于服务提供者会开启netty http server
+     * 服务消费者不会
+     * 服务提供者想要消费服务也是允许的
+     */
     private String type;
 
-    private String providerIp;
+    /**
+     * 当 type.equals("provider") 时必须配置
+     * 用于注册服务
+     */
+    private String rpcIp;
 
-    private int providerPort;
+    /**
+     * 当 type.equals("provider") 时必须配置
+     * 用于注册服务和 netty 启动
+     */
+    private int rpcPort;
 
-    private ConsumerProperties consumer;
+    /**
+     * nacos 配置
+     */
+    private NacosProperties nacos;
+
 
     private ApplicationContext applicationContext;
 
     @PostConstruct
     public void init() throws Exception{
-        if (providerIp == null) {
+        if (rpcIp == null) {
             InetAddress ip4 = Inet4Address.getLocalHost();
-            providerIp = ip4.getHostAddress();
+            rpcIp = ip4.getHostAddress();
         }
-        SignRpcProxy.setNacosAddress(nacosAddress);
-//        System.out.println("消费者");
-//        System.out.println(consumer);
-//        registerSingleton();
+        SignRpcProxy.setNacosAddress(nacos);
     }
 
-    private void registerSingleton() throws ClassNotFoundException {
-        List<String> services = consumer.getServices();
-        if (services != null && services.size() != 0) {
-            for (String service : services) {
-                Class clazz = Class.forName(service);
-                ((AnnotationConfigApplicationContext) applicationContext).getBeanFactory().registerSingleton(service, clazz.cast(SignRpcProxy.create(clazz)));
-            }
-        }
-    }
+
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
