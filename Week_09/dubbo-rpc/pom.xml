@@ -11,6 +11,7 @@
     <modules>
 
         <module>sign-rpc</module>
+        <module>dubbo-hmily-tcc</module>
     </modules>
 
     <properties>

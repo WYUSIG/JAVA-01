@@ -1,0 +1,43 @@
+server:
+  port: 8084
+  servlet:
+    context-path: /
+  address: 0.0.0.0
+spring:
+  datasource:
+    driver-class-name:  com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3316/hmily_demo?useUnicode=true&characterEncoding=utf8
+    username: root
+    password:
+dubbo:
+  scan:
+    base-packages: io.sign.www.hmily
+  protocol:
+    name: dubbo
+    port: 12345
+  registry:
+    address: zookeeper://localhost:2181
+  metadata-report:
+    address: zookeeper://localhost:2181
+  application:
+    qosEnable: true
+    qosPort: 22222
+    qosAcceptForeignIp: true
+    qos-enable-compatible: true
+    qos-host-compatible: localhost
+    qos-port-compatible: 22222
+    qos-accept-foreign-ip-compatible: true
+    qos-host: localhost
+mybatis:
+  type-aliases-package: io.sign.www.hmily
+  config-location: classpath:mybatis-config.xml
+logging:
+  level:
+    root: error
+    org.springframework.web: info
+    org.apache.ibatis: debug
+    org.dromara.hmily.demo.bonuspoint: debug
+    org.dromara.hmily.demo.lottery: debug
+    org.dromara.hmily.demo: debug
+  file:
+    path: "./logs"
