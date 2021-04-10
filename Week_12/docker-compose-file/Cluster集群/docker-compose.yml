@@ -1,0 +1,56 @@
+version: '3.4'
+services:
+  node1:
+    image: redis
+    container_name: redis-node-1
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+  node2:
+    image: redis
+    container_name: redis-node-2
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - 6380:6379
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+  node3:
+    image: redis
+    container_name: redis-node-3
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - 6381:6379
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+  node4:
+    image: redis
+    container_name: redis-node-4
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - 6382:6379
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+  node5:
+    image: redis
+    container_name: redis-node-5
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - 6383:6379
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+  node6:
+    image: redis
+    container_name: redis-node-6
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - 6384:6379
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf

@@ -1,0 +1,38 @@
+version: '3.4'
+services:
+  sentinel1:
+    image: redis
+    container_name: redis-sentinel-26379
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+    restart: always
+#    network_mode: "host"
+    ports:
+      - 26379:26379
+    volumes:
+      # 本地文件映射到容器里
+      - ./sentinel_26379.conf:/usr/local/etc/redis/sentinel.conf
+  sentinel2:
+    image: redis
+    container_name: redis-sentinel-26380
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+    restart: always
+#    network_mode: "host"
+    ports:
+      - 26380:26380
+    volumes:
+      - ./sentinel_26380.conf:/usr/local/etc/redis/sentinel.conf
+  sentinel3:
+    image: redis
+    container_name: redis-sentinel-26381
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+    restart: always
+#    network_mode: "host"
+    ports:
+      - 26381:26381
+    volumes:
+      - ./sentinel_26381.conf:/usr/local/etc/redis/sentinel.conf
+networks:
+  default:
+    external:
+      # 在通过docker ps拿到imasterd，通过docker inspect [id]拿到"Networks":下面的网桥名
+      name: _default
